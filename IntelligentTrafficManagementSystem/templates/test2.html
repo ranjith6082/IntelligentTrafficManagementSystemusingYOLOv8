@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image or Video</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='image1.png') }}");
+            /* Adjust background properties as needed */
+            background-size: cover; /* Cover the entire viewport */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            /* Optionally, you can add more styles to enhance the appearance */
+            /* For example, you can adjust the font color to make it more readable on the background */
+            color: white; /* Set font color to white */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <form action="/predict_img" class="form-signin col-lg-3" method="post" enctype="multipart/form-data" name="form1">
+            <h1 class="h3 mb-3 font-weight-normal">Upload any video</h1>
+            <input type="file" name="file" class="form-control-file" id="inputfile" accept="video/*">
+            <br>
+            <button class="btn btn-block btn-primary btn-sm" type="submit">Upload</button>
+        </form>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Traffic Management System Web App</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='image.png') }}");
+            /* Adjust background properties as needed */
+            background-size: cover; /* Cover the entire viewport */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            /* Optionally, you can add more styles to enhance the appearance */
+            /* For example, you can adjust the font color to make it more readable on the background */
+            color: white; /* Set font color to white */
+        }
+        h1 {
+            margin-right:50px;
+            text-align: center; /* Center the heading */
+            color: red; /* Set font color to red */
+            font-size: 30px; /* Set font size to 20px */
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        p {
+            text-align: justify;
+            margin-top: 20px;
+            margin-right:330px;
+            color: black; /* Set paragraph text color to black */
+            font-weight:bold;
+        }
+        .btn-margin {
+            margin-left: 10px; /* Adjust as needed */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Traffic Management System Web App</h1>
+        <p>Congestion in traffic is a major problem these days. Despite the fact that it appears to pervade all over, urban cities are the ones most influenced by it. And it's ever increasing nature makes it imperative to know the road traffic density in real time for better signal control and effective traffic management. There can be different causes of congestion in traffic like insufficient capacity, unrestrained demand, large Red Light delays etc. While insufficient capacity and  unrestrained demand are somewhere interrelated, the delay of respective light is hard coded and not dependent on traffic. Therefore, the need for simulating and optimizing traffic control to better accommodate this increasing demand arises. In recent years, image processing and surveillance systems have been widely used in traffic management for traveller’s information, ramp metering and updates in real time. The traffic density estimation can also be achieved using Image Processing. This project presents the method to use live images feed from the cameras at traffic junctions for real time traffic density calculation using image processing. It also focuses on the algorithm for switching the traffic lights according to vehicle density on road, thereby aiming at reducing the traffic congestion on roads which will help lower the number of accidents. In turn it will provide safe transit to people and reduce fuel consumption and waiting time. It will also provide significant data which will help in future road planning and analysis. In further stages multiple traffic lights can be synchronized with each other with an aim of even less traffic congestion and free flow of traffic. The vehicles are detected by the system through images instead of using electronic sensors embedded in the pavement. A camera will be placed alongside the traffic light. It will capture image sequences. Image processing is a better technique to control the state change of the traffic light. It shows that it can decrease the traffic congestion and avoids the time being wasted by a green light on an empty road. It is also more reliable in estimating vehicle presence because it uses actual traffic images. It visualizes the practicality, so it functions much better than those systems that rely on the detection of the vehicles’ metal content.</p>
+        <div class="left-section">
+            <div class="button-container">
+                <form action="/" method="post">
+                    <button type="submit" class="btn btn-primary">Add Image</button>
+                </form>
+                <form action="/test2" method="post">
+                    <button type="submit" class="btn btn-primary btn-margin">Add Video</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>YOLOv8 Object Detection</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='image1.png') }}");
+            /* Adjust background properties as needed */
+            background-size: cover; /* Cover the entire viewport */
+            background-repeat: no-repeat; /* Do not repeat the image */
+            /* Optionally, you can add more styles to enhance the appearance */
+            /* For example, you can adjust the font color to make it more readable on the background */
+            color: white; /* Set font color to white */
+        }
+        canvas {
+            display:block;
+            border: 1px solid black;
+            margin-top:10px;
+        }
+
+        /* Custom CSS to style the layout */
+        .image-upload-container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .image-upload-container .col-md-3 {
+            flex: 0 0 calc(25% - 20px); /* Adjusted to 25% to accommodate all buttons in a single row */
+            margin-right: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 767px) {
+            .image-upload-container .col-md-3 {
+                flex: 0 0 100%;
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <!-- Image upload container with all buttons in a single row -->
+        <div class="row image-upload-container">
+            <div class="col-md-3">
+                <input class="form-control mb-3" type="file" id="uploadInput1"/>
+                <p>Number of vehicles in lane1: <span id="lane1Count">0</span></p>
+                <p>On time for lane1: <span id="lane1Time">0</span> <img src="static/greensignal1.jpg" alt="Description of the image" width="40" height="40"></p>
+            </div>
+            <div class="col-md-3">
+                <input class="form-control mb-3" type="file" id="uploadInput2"/>
+                <p>Number of vehicles in lane2: <span id="lane2Count">0</span></p>
+                <p>On time for lane1: <span id="lane2Time">0</span> <img src="static/greensignal1.jpg" alt="Description of the image" width="40" height="40"></p>
+            </div>
+            <div class="col-md-3">
+                <input class="form-control mb-3" type="file" id="uploadInput3"/>
+                <p>Number of vehicles in lane3: <span id="lane3Count">0</span></p>
+                <p>On time for lane1: <span id="lane3Time">0</span> <img src="static/greensignal1.jpg" alt="Description of the image" width="40" height="40"></p>
+            </div>
+            <div class="col-md-3">
+                <input class="form-control mb-3" type="file" id="uploadInput4"/>
+                <p>Number of vehicles in lane4: <span id="lane4Count">0</span></p>
+                <p>On time for lane1: <span id="lane4Time">0</span> <img src="static/greensignal1.jpg" alt="Description of the image" width="40" height="40"></p>
+            </div>
+        </div>
+
+        <!-- Canvas elements for displaying detected objects -->
+        <div class="row">
+            <div class="col-md-6">
+                <canvas id="canvas1" class="mt-3"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="canvas2" class="mt-3"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="canvas3" class="mt-3"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="canvas4" class="mt-3"></canvas>
+            </div>
+        </div>
+
+        <!-- Submit button for stopwatch timer -->
+        <div class="row justify-content-center">
+            <button id="startTimerButton" class="btn btn-primary mt-3">Start Timer</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and custom script -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        let timer;
+        let currentLane = 1;
+        let maxTimer = 60;
+
+        function startTimer() {
+            timer = setInterval(() => {
+                if (maxTimer === 0) {
+                    clearInterval(timer);
+                    moveToNextLane();
+                } else {
+                    maxTimer--;
+                    document.getElementById(`lane${currentLane}Time`).textContent = maxTimer;
+                }
+            }, 1000);
+        }
+
+        function moveToNextLane() {
+            currentLane++;
+            maxTimer = calculateMaxTimer(currentLane);
+            if (currentLane > 4) {
+                alert("All lanes covered!");
+                return;
+            }
+            document.getElementById(`lane${currentLane}Time`).textContent = maxTimer;
+            startTimer();
+        }
+
+        function calculateMaxTimer(lane) {
+        // You can adjust this logic based on your requirements
+        const maxTimer = 60; // Define maxTimer variable here
+        const vehicleCount = parseInt(document.getElementById(`lane${lane}Count`).textContent);
+
+        if (vehicleCount == 0) {
+            return 0;
+        }
+        else{
+            res=Math.floor(vehicleCount * 1.20);
+            if(res>=60){
+                return maxTimer;
+            }
+            else{
+                return res;
+            }
+        }
+    }
+
+
+        document.getElementById("startTimerButton").addEventListener("click", () => {
+            startTimer();
+        });
+
+        // Function to handle file upload and object detection
+        async function handleUploadAndDetect(inputId, canvasId, countId) {
+            const input = document.getElementById(inputId);
+            const file = input.files[0];
+            const data = new FormData();
+            data.append("image_file", file, "image_file");
+            const response = await fetch("/detect", {
+                method: "post",
+                body: data
+            });
+            const responseData = await response.json();
+            const boxes = responseData.boxes;
+            const boxCount = responseData.box_count;
+            drawImageAndBoxes(file, boxes, canvasId, boxCount,countId);
+        }
+
+        // Function to draw image and detected boxes on canvas
+        function drawImageAndBoxes(file, boxes, canvasId,boxCount, countId) {
+            const img = new Image()
+            img.src = URL.createObjectURL(file);
+            img.onload = () => {
+                const canvas = document.getElementById(canvasId);
+                const ctx = canvas.getContext("2d");
+                canvas.width = 540; // Set canvas width to 540
+                canvas.height = 330; // Set canvas height to 330
+                ctx.drawImage(img, 0, 0, 540, 330); // Draw image with width of 540 and height of 330
+                ctx.strokeStyle = "#00FF00";
+                ctx.lineWidth = 3;
+                ctx.font = "18px serif";
+
+                // Display bounding boxes and count
+                boxes.forEach(([x1, y1, x2, y2, label]) => {
+                    // Scale bounding box coordinates to fit 540x330 canvas
+                    x1 = x1 * (540 / img.width);
+                    y1 = y1 * (330 / img.height);
+                    x2 = x2 * (540 / img.width);
+                    y2 = y2 * (330 / img.height);
+
+                    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+                    ctx.fillStyle = "#00ff00";
+                    const width = ctx.measureText(label).width;
+                    ctx.fillRect(x1, y1, width + 10, 25);
+                    ctx.fillStyle = "#000000";
+                    ctx.fillText(label, x1, y1 + 18);
+
+                });
+
+                // Display count
+                const countElement = document.getElementById(countId);
+                countElement.textContent = boxCount;
+
+                // Update max timer for the current lane
+                maxTimer = calculateMaxTimer(currentLane);
+                document.getElementById(`lane${currentLane}Time`).textContent = maxTimer;
+            }
+        }
+
+        // Event listeners for file input change
+        document.getElementById("uploadInput1").addEventListener("change", () => {
+            handleUploadAndDetect("uploadInput1", "canvas1", "lane1Count");
+        });
+        document.getElementById("uploadInput2").addEventListener("change", () => {
+            handleUploadAndDetect("uploadInput2", "canvas2", "lane2Count");
+        });
+        document.getElementById("uploadInput3").addEventListener("change", () => {
+            handleUploadAndDetect("uploadInput3", "canvas3", "lane3Count");
+        });
+        document.getElementById("uploadInput4").addEventListener("change", () => {
+            handleUploadAndDetect("uploadInput4", "canvas4", "lane4Count");
+        });
+    </script>
+</body>
+</html>
